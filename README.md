@@ -103,15 +103,26 @@ In the pre-commit, we will do 3 things:
 - Run `pytest`
 
 #### Configure detect-secrets
-1. Create secret baseline
-    ```bash
-    detect-secrets scan > .secrets.baseline
-    ```
-    Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project docs: [link](https://github.com/Yelp/detect-secrets).
+```bash
+detect-secrets scan > .secrets.baseline
+```
+Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project docs: [link](https://github.com/Yelp/detect-secrets).
 
-1. Pytest
+**Note**: `detect-secrets` may flag image outputs in notebooks as leaked passwords. --> You may clear cell outputs from notebooks to avoid errors.  
 
-    I’ll add more tests over time to improve code quality. One **note**: if the repository contains no tests, running pytest in CI can produce a non-zero exit (i.e., a failing run), which will cause a `GitHub Actions` job that runs `pytest` on push to be marked as failed.
+#### Pytest
+
+I’ll add more tests over time to improve code quality. One **note**: if the repository contains no tests, running pytest in CI can produce a non-zero exit (i.e., a failing run), which will cause a `GitHub Actions` job that runs `pytest` on push to be marked as failed.
+
+### Autogluon development
+
+There are 4 main folders we need to consider:
+1. **./data**: Store all the datasets.
+
+    Format of the data must have the required columns defined in `./src/dataloader` .
+1. **./models**: Store all the trained models.
+1. **./noteboooks**: Store notebooks for experimentation.
+1. **./src**: Store both scripts and dataloader. 
 
 ---
 

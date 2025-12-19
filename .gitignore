@@ -49,11 +49,23 @@ coverage.xml
 *.mo
 *.pot
 
-# Django stuff:
-*.log
-
 # Sphinx documentation
 docs/_build/
 
 # PyBuilder
 target/
+
+# Ignore environment files
+.env
+.env.*
+.venv*
+
+# Ignore datasets
+data/
+
+# Ignore trained models except .dvc files
+models/**
+!models/**/*.dvc
+
+# Ignore wandb files
+wandb/
