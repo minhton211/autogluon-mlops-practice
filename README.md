@@ -95,6 +95,24 @@ uv add <package> --optional <ml|aws|test> --active
 
 ```--active``` prevents uv from creating a default .venv when you use a custom virtual environment name.
 
+### 3. Pre-commit hook configuration
+
+In the pre-commit, we will do 3 things:
+- Detect potentially leaked passwords using `detect-secrets`
+- Correct formatting mistakes in python code using `black`
+- Run `pytest`
+
+#### Configure detect-secrets
+1. Create secret baseline
+    ```bash
+    detect-secrets scan > .secrets.baseline
+    ```
+    Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project docs: [link](https://github.com/Yelp/detect-secrets).
+
+1. Pytest
+
+    I’ll add more tests over time to improve code quality. One **note**: if the repository contains no tests, running pytest in CI can produce a non-zero exit (i.e., a failing run), which will cause a `GitHub Actions` job that runs `pytest` on push to be marked as failed.
+
 ---
 
 ## Current limitations
