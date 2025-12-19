@@ -102,6 +102,8 @@ In the pre-commit, we will do 3 things:
 - Correct formatting mistakes in python code using `black`
 - Run `pytest`
 
+Run `pre-commit install` to set up the git hook scripts.
+
 #### Configure detect-secrets
 ```bash
 detect-secrets scan > .secrets.baseline
