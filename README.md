@@ -191,6 +191,10 @@ dvc remote modify storage endpointurl http://localhost:4566
 ```
 Then we can use `dvc push` and `dvc pull` to push and fetch files from remote storage. 
 
+### Containerize with Docker
+Next, we will containerize Autogluon inference code, we will take advantage of the remote storage so that we will only containerize the environment and library, the models themselves will be pulled from S3 storage at runtime using dvc. In this section, we will try to containerize the code inside ./deploy folder.
+To load the model at runtime, we create an entrypoint file `star.sh`. Notice that inside `.env` the s3 endpoint url has been changed from `localhost` to `host.docker.internal`, this is because `localhost` when used inside a container will point to itself, not the container that is running localstack.
+
 ---
 
 ## Current limitations
