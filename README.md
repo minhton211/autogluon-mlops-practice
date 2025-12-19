@@ -116,13 +116,24 @@ I’ll add more tests over time to improve code quality. One **note**: if the re
 
 ### Autogluon development
 
-There are 4 main folders we need to consider:
-1. **./data**: Store all the datasets.
+There are four main directories to be aware of:
 
-    Format of the data must have the required columns defined in `./src/dataloader` .
-1. **./models**: Store all the trained models.
-1. **./noteboooks**: Store notebooks for experimentation.
-1. **./src**: Store both scripts and dataloader. 
+1. **`./data`**  
+   Contains all datasets used in the project.  
+   The data format must include the required columns defined in `./src/dataloader`.
+
+2. **`./models`**  
+   Holds all trained model artifacts.
+
+3. **`./notebooks`**  
+   Used for experimentation and model training.  
+   Models are trained through these notebooks, and training results are logged with **Weights & Biases (wandb)**.
+
+4. **`./src`**  
+   Contains the core source code, including data loaders and test scripts.
+
+### Data versioning with dvc
+
 
 ---
 
