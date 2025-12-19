@@ -1,6 +1,7 @@
 import pandas as pd
 from .config import DATA_PATHS
 
+
 def load_dataset_DummyDataset(col_format) -> pd.Series:
     """
     Load and standardize Dummy Dataset.
