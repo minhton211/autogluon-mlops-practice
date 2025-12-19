@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version:  [3.6]
+        python-version:  [3.10.11]
 
     steps:
     - uses: actions/checkout@v2
@@ -19,11 +19,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest black
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install -e ".[test]"
     - name: Test with pytest
       run: |
-        pytest
+        pytest 
     - name: Python Black
       run: |
         black . --check
