@@ -106,7 +106,7 @@ In the pre-commit, we will do 3 things:
 ```bash
 detect-secrets scan > .secrets.baseline
 ```
-Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project docs: [link](https://github.com/Yelp/detect-secrets).
+Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project [official documentation](https://github.com/Yelp/detect-secrets).
 
 **Note**: `detect-secrets` may flag image outputs in notebooks as leaked passwords. --> You may clear cell outputs from notebooks to avoid errors.  
 
@@ -132,45 +132,55 @@ There are four main directories to be aware of:
 4. **`./src`**  
    Contains the core source code, including data loaders and test scripts.
 
-### S3 storage with localstack
+### S3 Storage with LocalStack
 
-Before moving on with large data versioning and containerization, I want to first introduce about S3 and localstack.
-- S3 is a cloud storage server from Amazon Web Service (AWS)
-- LocalStack is a cloud service emulator that can enable us to run Amazon Web Service locally, without connecting to any cloud providers.
+Prior to implementing large-scale data versioning and containerization, it is essential to establish foundational knowledge of S3 and LocalStack.
+
+- **S3** is a cloud storage service provided by Amazon Web Services (AWS)
+- **LocalStack** is a cloud service emulator that enables local execution of Amazon Web Services without requiring connection to remote cloud providers
 
 #### Credentials
-Shared credentials for every user
+
+Shared credentials configuration for all Localstack users:
+
 ```bash
 AWS_ACCESS_KEY_ID=test
 AWS_SECRET_ACCESS_KEY=test
 AWS_DEFAULT_REGION=us-east-1
 ```
 
-#### Quick start
-Firstly, start localstack with:
+#### Quick Start
+
+Begin by launching LocalStack:
+
 ```bash
 localstack start
 ```
 
-Then, we have 2 ways to create bucket in s3:
+There are two methods available for creating an S3 bucket:
+
+```bash
+aws --endpoint-url=http://localhost:4566 s3 mb s3://sample-bucket
+
+awslocal s3api create-bucket --bucket sample-bucket  # requires awslocal-cli library (recommended)
 ```
-aws --endpoint-url=http://localhost:4566 s3 mb s3://baswap
 
-awslocal s3api create-bucket --bucket sample-bucket  # require library awslocal-cli, recommended
-```
+The `awslocal` utility serves as a lightweight wrapper that simplifies command syntax.
 
-The `aws-local` is a lightweight wrapper to make the code shorter.
+For comprehensive documentation regarding S3 storage in LocalStack, please consult the [official documentation](https://docs.localstack.cloud/aws/services/s3/).
 
-To have more information about s3 storage in localstack, please refer to this [link](https://docs.localstack.cloud/aws/services/s3/).
+### Data Versioning with DVC
 
-### Data versioning with dvc
-To learn more information about DVC, please refer to this [link](https://doc.dvc.org/start)
+For detailed information about DVC, please refer to the [official documentation](https://doc.dvc.org/start).
 
-Firstly, we initialize the DVC
+Begin by initializing DVC:
+
 ```bash
 dvc init
 ```
-Then, we need to add and git commit some files created by dvc inside ./.dvc:
+
+Subsequently, add and commit the files created by DVC within the `./.dvc` directory:
+
 ```bash
 git status
 Changes to be committed:
@@ -179,21 +189,28 @@ Changes to be committed:
         ...
 git commit -m "Initialize DVC"
 ```
-Next, we use `dvc add` to keep tracking files. Remember that the tracked files should be included in .gitignore, but `<tracked-file-name>.dvc` file must be visible.
 
-The data will be cached locally and then can be push to a remote storage, to use dvc with s3, we need to download extra library `dvc-s3`:
+Next, utilize `dvc add` to track files. Note that tracked files should be listed in `.gitignore`, while their corresponding `<tracked-file-name>.dvc` files must remain visible to Git.
+
+Data will be cached locally and can subsequently be pushed to remote storage. To integrate DVC with S3, install the additional `dvc-s3` library:
+
 ```bash
-dvc remote add -d <storage name> s3://baswap/  
-``` 
-Because we are using localstack, we need to configure the endpoint url of s3 storage:
-```bash
-dvc remote modify storage endpointurl http://localhost:4566  
+dvc remote add -d <storage name> s3://baswap/
 ```
-Then we can use `dvc push` and `dvc pull` to push and fetch files from remote storage. 
 
-### Containerize with Docker
-Next, we will containerize Autogluon inference code, we will take advantage of the remote storage so that we will only containerize the environment and library, the models themselves will be pulled from S3 storage at runtime using dvc. In this section, we will try to containerize the code inside ./deploy folder.
-To load the model at runtime, we create an entrypoint file `star.sh`. Notice that inside `.env` the s3 endpoint url has been changed from `localhost` to `host.docker.internal`, this is because `localhost` when used inside a container will point to itself, not the container that is running localstack.
+When working with LocalStack, configure the S3 storage endpoint URL:
+
+```bash
+dvc remote modify storage endpointurl http://localhost:4566
+```
+
+You can then use `dvc push` and `dvc pull` to synchronize files with remote storage.
+
+### Containerization with Docker
+
+The next phase involves containerizing the AutoGluon inference code. By leveraging remote storage, the containerization process focuses on the environment and libraries, while models are retrieved from S3 storage at runtime using DVC. This section addresses the containerization of code within the `./deploy` directory.
+
+To facilitate model loading at runtime, create an entrypoint file named `start.sh`. Note that within the `.env` file, the S3 endpoint URL has been modified from `localhost` to `host.docker.internal`. This adjustment is necessary because `localhost` within a container references the container itself rather than the host machine running LocalStack.
 
 ---
 
