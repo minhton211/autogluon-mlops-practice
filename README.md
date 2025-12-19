@@ -132,8 +132,64 @@ There are four main directories to be aware of:
 4. **`./src`**  
    Contains the core source code, including data loaders and test scripts.
 
-### Data versioning with dvc
+### S3 storage with localstack
 
+Before moving on with large data versioning and containerization, I want to first introduce about S3 and localstack.
+- S3 is a cloud storage server from Amazon Web Service (AWS)
+- LocalStack is a cloud service emulator that can enable us to run Amazon Web Service locally, without connecting to any cloud providers.
+
+#### Credentials
+Shared credentials for every user
+```bash
+AWS_ACCESS_KEY_ID=test
+AWS_SECRET_ACCESS_KEY=test
+AWS_DEFAULT_REGION=us-east-1
+```
+
+#### Quick start
+Firstly, start localstack with:
+```bash
+localstack start
+```
+
+Then, we have 2 ways to create bucket in s3:
+```
+aws --endpoint-url=http://localhost:4566 s3 mb s3://baswap
+
+awslocal s3api create-bucket --bucket sample-bucket  # require library awslocal-cli, recommended
+```
+
+The `aws-local` is a lightweight wrapper to make the code shorter.
+
+To have more information about s3 storage in localstack, please refer to this [link](https://docs.localstack.cloud/aws/services/s3/).
+
+### Data versioning with dvc
+To learn more information about DVC, please refer to this [link](https://doc.dvc.org/start)
+
+Firstly, we initialize the DVC
+```bash
+dvc init
+```
+Then, we need to add and git commit some files created by dvc inside ./.dvc:
+```bash
+git status
+Changes to be committed:
+        new file:   .dvc/.gitignore
+        new file:   .dvc/config
+        ...
+git commit -m "Initialize DVC"
+```
+Next, we use `dvc add` to keep tracking files. Remember that the tracked files should be included in .gitignore, but `<tracked-file-name>.dvc` file must be visible.
+
+The data will be cached locally and then can be push to a remote storage, to use dvc with s3, we need to download extra library `dvc-s3`:
+```bash
+dvc remote add -d <storage name> s3://baswap/  
+``` 
+Because we are using localstack, we need to configure the endpoint url of s3 storage:
+```bash
+dvc remote modify storage endpointurl http://localhost:4566  
+```
+Then we can use `dvc push` and `dvc pull` to push and fetch files from remote storage. 
 
 ---
 
