@@ -1,64 +1,112 @@
-# autogluon-mlops-practice
+# AutoGluon MLOps Practice – Salinity Prediction in the Mekong Delta
 
-Project created with MLOps-Template cookiecutter. For more info: https://mlopsstudygroup.github.io/mlops-guide/
+---
 
+## 📌 Project Overview
 
-## 📋 Requirements
+This repository is part of my work on **applying AutoGluon to predict river salinity levels in the Mekong River Delta (Vietnam)**, as well as my **hands-on practice with MLOps principles and tooling**.
 
-* DVC
-* Python3 and pip
-* Access to IBM Cloud Object Storage
+The project structure and workflow are strongly inspired and guided by:
+- https://mlops-guide.github.io/Structure/starting/
+- https://github.com/graviraja/MLOps-Basics
 
-## 🏃🏻 Running Project
+This repository serves both as:
+- A **research / experimentation workspace**
+- A **learning-oriented MLOps practice project**
 
-### 🔑 Setup IBM Bucket Credentials for IBM COS
+---
 
-#### MacOS and Linux
-Setup your credentials on ```~/.aws/credentials``` and ```~/.aws/config```. DVC works perfectly with IBM Obejct Storage, although it uses S3 protocol, you can also see this in other portions of the repository.
+## Components
 
+The following tools and technologies are used:
 
-~/.aws/credentials
+- **Git** – Code version control  
+- **DVC** – Data and model version control  
+- **AutoGluon** – Automated machine learning for tabular data  
+- **Docker** – Containerization of trained models  
+- **S3 (LocalStack)** – Remote storage backend for DVC  
+- **Pytest & pre-commit hooks** – Testing and code quality checks  
 
-```credentials
-[default]
-aws_access_key_id = {Key ID}
-aws_secret_access_key = {Access Key}
+---
+
+## Project Workflow
+
+**Notebook ➜ Model Files ➜ DVC to S3 ➜ Docker Image**
+
+1️⃣ **Develop** in a Jupyter notebook.  
+2️⃣ **Convert** notebook logic into reusable model/training scripts.  
+3️⃣ **Version & push** artifacts with DVC to S3 (LocalStack for local use).  
+4️⃣ **Build Docker image** that pulls artifacts from S3 and packages the app.
+
+---
+
+## Replication steps
+
+### 1. Project initialization
+The repository was bootstrapped from the MLOps cookiecutter template:
+
+```bash
+cookiecutter https://github.com/mlops-guide/mlops-template.git
 ```
 
+After initialization, I removed unused files and initialized project metadata and create pyproject.toml by running:
 
-### ✅ Pre-commit Testings
-
-In order to activate pre-commit testing you need ```pre-commit```
-
-Installing pre-commit with pip
+```bash
+uv init
 ```
-pip install pre-commit
-```
+**Dependency policy:** this project uses pyproject.toml (with uv.lock) rather than requirements.txt to support optional dependency groups (extras) for separating test / ml / aws dependencies.
 
-Installing pre-commit on your local repository. Keep in mind this creates a Github Hook.
-```
-pre-commit install
-```
+### 2. Virtual environment initialization
 
-Now everytime you make a commit, it will run some tests defined on ```.pre-commit-config.yaml``` before allowing your commit.
+Create two isolated virtual environments to enforce separation of concerns:
 
-**Example**
-```
-$ git commit -m "Example commit"
+- `.venv-ml` — Python 3.10, primary environment for ML development (modeling, experiments).  
+- `.venv-aws` — Python 3.12, environment to run LocalStack and AWS-related tooling.
 
-black....................................................................Passed
-pytest-check.............................................................Passed
-```
+This split keeps ML dependencies (Autogluon, data libraries) separate from AWS/infra tooling and avoids cross-contamination of packages. 
 
+**Note 1**: Autogluon and related ML tooling are best used on Python 3.10; LocalStack and AWS tools can run on newer runtimes (3.12).
 
-### ⚗️ Using DVC
+**Note 2**: You can list all available python version by running `py -0`. 
 
-Download data from the DVC repository(analog to ```git pull```)
-```
-dvc pull
+#### Create the ML environment 
+```bash
+py -3.10 -m venv .venv-ml
+source .venv-ml/bin/activate
+pip install -e ".[ml]"
 ```
 
-Reproduces the pipeline using DVC
+#### Create the AWS environment 
+```bash
+py -3.12 -m venv .venv-aws
+source .venv-ml/bin/activate
+pip install -e ".[aws]"
 ```
-dvc repro
+
+#### Managing dependencies with uv
+
+When adding libraries, update pyproject.toml and the lockfile using uv so optional groups stay consistent:
+
+```bash
+uv add <package> --optional <ml|aws|test> --active
 ```
+
+```--optional <group>``` places the package into the named optional dependency group (e.g., ml, aws, test).
+
+```--active``` prevents uv from creating a default .venv when you use a custom virtual environment name.
+
+---
+
+## Current limitations
+- No Docker registry: images are built locally; no push to a central registry is configured.
+
+- No CI/CD: the workflow is manual and local; automated pipelines are out of scope for now.
+
+- No serving or monitoring: the scope covers data/model versioning and reproducible builds only — production serving, logging, and monitoring are not implemented.
+
+---
+
+## References
+- MLOps guide: https://mlops-guide.github.io/Structure/starting/
+
+- MLOps basics repo: https://github.com/graviraja/MLOps-Basics
