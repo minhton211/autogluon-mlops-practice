@@ -110,7 +110,9 @@ detect-secrets scan > .secrets.baseline
 ```
 Run the command above to produce a `.secrets.baseline` file that lists all secrets detected in the repository’s current state. Add and commit this file so you can track newly detected secrets against that baseline. Note that `detect-secrets` only compares the current findings to the baseline, it does not search the repository’s commit history for previously leaked secrets. For details on managing the baseline, see the project [official documentation](https://github.com/Yelp/detect-secrets).
 
-**Note**: `detect-secrets` may flag image outputs in notebooks as leaked passwords. --> You may clear cell outputs from notebooks to avoid errors.  
+**Note 1**: `.secrets.baseline` may be saved under incorrect format (e.g. UTF16 LE) leading to error 'Unable to read baseline'. Always make sure it is saved as `UTF-8` format.
+
+**Note 2**: `detect-secrets` may flag image outputs in notebooks as leaked passwords. --> You may clear cell outputs from notebooks to avoid errors.  
 
 #### Pytest
 
