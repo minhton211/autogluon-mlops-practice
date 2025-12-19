@@ -212,9 +212,16 @@ You can then use `dvc push` and `dvc pull` to synchronize files with remote stor
 
 ### Containerization with Docker
 
-The next phase involves containerizing the AutoGluon inference code. By leveraging remote storage, the containerization process focuses on the environment and libraries, while models are retrieved from S3 storage at runtime using DVC. This section addresses the containerization of code within the `./deploy` directory.
+The next phase involves containerizing the AutoGluon inference code. By leveraging remote storage, the containerization process focuses on the environment and libraries, while models are retrieved from S3 storage at runtime using DVC. This section addresses the containerization of code within the `./deploy` directory. Run the below command to start building:
+```bash
+docker build -t baswap-ts .
+```
+Remember to have the trailing dot.
 
-To facilitate model loading at runtime, create an entrypoint file named `start.sh`. Note that within the `.env` file, the S3 endpoint URL has been modified from `localhost` to `host.docker.internal`. This adjustment is necessary because `localhost` within a container references the container itself rather than the host machine running LocalStack.
+To facilitate model loading at runtime, create an entrypoint file named `start.sh`. Note that within the `.env` file, the S3 endpoint URL has been modified from `localhost` to `host.docker.internal`. This adjustment is necessary because `localhost` within a container references the container itself rather than the host machine running LocalStack. Run the below code to run a container created by the image:
+```bash
+docker run --rm --env-file deploy/.env baswap-ts
+```
 
 ---
 
