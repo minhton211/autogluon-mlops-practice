@@ -72,14 +72,14 @@ This split keeps ML dependencies (Autogluon, data libraries) separate from AWS/i
 #### Create the ML environment 
 ```bash
 py -3.10 -m venv .venv-ml
-source .venv-ml/bin/activate
+.venv-ml\Scripts\Activate.ps1 
 pip install -e ".[ml]"
 ```
 
 #### Create the AWS environment 
 ```bash
 py -3.12 -m venv .venv-aws
-source .venv-ml/bin/activate
+.venv-aws\Scripts\Activate.ps1 
 pip install -e ".[aws]"
 ```
 
