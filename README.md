@@ -60,12 +60,12 @@ uv init
 
 Create two isolated virtual environments to enforce separation of concerns:
 
-- `.venv-ml` — Python 3.10, primary environment for ML development (modeling, experiments).  
+- `.venv-ml` — Python 3.12, primary environment for ML development (modeling, experiments).  
 - `.venv-aws` — Python 3.12, environment to run LocalStack and AWS-related tooling.
 
 This split keeps ML dependencies (Autogluon, data libraries) separate from AWS/infra tooling and avoids cross-contamination of packages. 
 
-**Note 1**: Autogluon and related ML tooling are best used on Python 3.10; LocalStack and AWS tools can run on newer runtimes (3.12).
+**Note 1**: Autogluon is recommended for use on Python 3.10; LocalStack and AWS tools can run on newer runtimes (3.12).
 
 **Note 2**: You can list all available python version by running `py -0`. 
 
